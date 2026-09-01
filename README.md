@@ -12,13 +12,13 @@ The system will use verified official government information, Retrieval-Augmente
 
 NeetiNex aims to help users:
 
-- Discover relevant government schemes without knowing the exact scheme name.
-- Ask questions about known schemes in natural language.
-- Understand scheme benefits, eligibility, required documents, and application procedures.
-- Check potential eligibility using structured scheme-specific rules.
-- Receive answers grounded in verified official government sources.
-- Upload government scheme documents and ask questions about them.
-- Interact through text and voice.
+* Discover relevant government schemes without knowing the exact scheme name.
+* Ask questions about known schemes in natural language.
+* Understand scheme benefits, eligibility, required documents, and application procedures.
+* Check potential eligibility using structured scheme-specific rules.
+* Receive answers grounded in verified official government sources.
+* Upload government scheme documents and ask questions about them.
+* Interact through text and voice.
 
 The system will initially focus on:
 
@@ -37,7 +37,7 @@ AI-generated answers must not be presented as official government information un
 
 ---
 
-## Planned Architecture
+# Planned Architecture
 
 ```text
 User Interfaces
@@ -69,36 +69,36 @@ Knowledge Layer
 
 ---
 
-## Planned Technology Stack
+# Planned Technology Stack
 
-### Frontend
+## Frontend
 
-- React
-- Vite
-- TypeScript
-- Tailwind CSS
+* React
+* Vite
+* TypeScript
+* Tailwind CSS
 
-### Backend
+## Backend
 
-- Python
-- FastAPI
-- Pydantic
+* Python 3.11
+* FastAPI
+* Pydantic
 
-### AI and RAG
+## AI and RAG
 
-- Sentence Transformers for embeddings
-- Vector search
-- BM25 keyword search
-- Hybrid retrieval
-- Reranking
-- LLM-based response generation
+* Sentence Transformers for embeddings
+* Vector Search
+* BM25 Keyword Search
+* Hybrid Retrieval
+* Reranking
+* LLM-based Response Generation
 
-### Data and Storage
+## Data and Storage
 
-- Structured scheme data: PostgreSQL or SQLite during early development
-- Vector database: ChromaDB for the MVP
-- Local document storage for uploaded files
-- JSON-based eligibility rules during the MVP
+* Structured scheme data: PostgreSQL or SQLite during early development
+* Vector database: ChromaDB for the MVP
+* Local document storage for uploaded files
+* JSON-based eligibility rules during the MVP
 
 The exact database and deployment choices may be finalized after the MVP data pipeline is working.
 
@@ -108,8 +108,8 @@ The exact database and deployment choices may be finalized after the MVP data pi
 
 ```text
 NeetiNex/
-│
-├── frontend/                  # Web dashboard
+
+├── frontend/                   # React web dashboard
 │   ├── public/
 │   └── src/
 │       ├── components/
@@ -122,7 +122,7 @@ NeetiNex/
 │       ├── services/
 │       └── types/
 │
-├── backend/                   # FastAPI backend
+├── backend/                    # FastAPI backend
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── routes/
@@ -145,19 +145,19 @@ NeetiNex/
 │   └── tests/
 │
 ├── data/
-│   ├── raw/                   # Collected source data
-│   ├── verified/              # Verified source information
-│   ├── processed/             # Cleaned/chunked data
-│   ├── schemes/               # Structured scheme records
-│   └── eligibility_rules/     # Rule definitions
+│   ├── raw/                    # Collected source data
+│   ├── verified/               # Verified source information
+│   ├── processed/              # Cleaned/chunked data
+│   ├── schemes/                # Structured scheme records
+│   └── eligibility_rules/      # Rule definitions
 │
 ├── storage/
 │   ├── vector_db/
 │   ├── bm25_index/
 │   └── uploads/
 │
-├── scripts/                   # Data processing and utility scripts
-├── notebooks/                 # Experiments and analysis
+├── scripts/                    # Data processing and utility scripts
+├── notebooks/                  # Experiments and analysis
 │
 ├── docs/
 │   ├── architecture/
@@ -175,28 +175,285 @@ NeetiNex/
 
 ---
 
-## Data Source Policy
+# Prerequisites
 
-Primary sources must include official government resources such as:
+Before running the project, install:
 
-- Government ministry and department websites
-- Official government portals
-- Official scheme pages
-- Government notifications
-- Scheme guidelines
-- Official government PDF documents
+* Python 3.11
+* Node.js 18 or newer
+* npm
+* Git
+* VS Code (Recommended)
 
-Every important scheme record should retain source metadata where available:
+Check installed versions:
 
-- Source URL
-- Document name
-- Relevant page or section
-- Verification date
-- Last checked date
+```bash
+python --version
+node --version
+npm --version
+git --version
+```
+
+> **Note:** Python 3.11 is recommended for this project because AI, RAG, and machine learning libraries generally have stable compatibility with this version.
 
 ---
 
-## Eligibility Policy
+# Project Setup
+
+## 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+```
+
+Move into the project directory:
+
+```bash
+cd NeetiNex
+```
+
+---
+
+# Backend Setup
+
+## 1. Move to the Backend Directory
+
+```bash
+cd backend
+```
+
+## 2. Create a Python 3.11 Virtual Environment
+
+On Windows:
+
+```bash
+py -3.11 -m venv venv
+```
+
+This creates a virtual environment using Python 3.11.
+
+## 3. Activate the Virtual Environment
+
+### Windows PowerShell
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+### Windows Command Prompt
+
+```cmd
+venv\Scripts\activate
+```
+
+After activation, verify the Python version:
+
+```bash
+python --version
+```
+
+Expected output:
+
+```text
+Python 3.11.x
+```
+
+---
+
+## 4. Upgrade pip
+
+```bash
+python -m pip install --upgrade pip
+```
+
+---
+
+## 5. Install Backend Dependencies
+
+After creating the `requirements.txt` file:
+
+```bash
+pip install -r requirements.txt
+```
+
+Example dependencies:
+
+```text
+fastapi
+uvicorn
+pydantic
+sentence-transformers
+chromadb
+rank-bm25
+python-multipart
+pypdf
+python-dotenv
+```
+
+---
+
+# Run the Backend
+
+Make sure the virtual environment is activated.
+
+From the `backend` directory:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The backend server will start locally.
+
+Default API URL:
+
+```text
+http://127.0.0.1:8000
+```
+
+FastAPI interactive API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+# Frontend Setup
+
+Open another terminal.
+
+Move to the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+---
+
+# Run the Frontend
+
+Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+The terminal will display a local URL similar to:
+
+```text
+http://localhost:5173
+```
+
+Open this URL in your browser.
+
+---
+
+# Running the Complete Project
+
+Two terminals are required during development.
+
+## Terminal 1 — Backend
+
+```bash
+cd NeetiNex/backend
+```
+
+Activate the Python environment:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+Run the backend:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+---
+
+## Terminal 2 — Frontend
+
+```bash
+cd NeetiNex/frontend
+```
+
+Run:
+
+```bash
+npm run dev
+```
+
+---
+
+# Development Workflow
+
+The recommended development order is:
+
+```text
+1. Initialize Backend
+        ↓
+2. Create Scheme Data Model
+        ↓
+3. Collect Official Scheme Data
+        ↓
+4. Verify and Store Sources
+        ↓
+5. Implement Basic Scheme Search
+        ↓
+6. Add Embeddings and Vector Search
+        ↓
+7. Implement BM25 Search
+        ↓
+8. Implement Hybrid Retrieval
+        ↓
+9. Add Reranking
+        ↓
+10. Implement RAG Response Generation
+        ↓
+11. Add Source References
+        ↓
+12. Implement Eligibility Engine
+        ↓
+13. Develop Frontend Dashboard
+        ↓
+14. Add Document RAG
+        ↓
+15. Add Voice Interaction
+        ↓
+16. Telephone Interface (Optional)
+```
+
+---
+
+# Data Source Policy
+
+Primary sources must include official government resources such as:
+
+* Government ministry and department websites
+* Official government portals
+* Official scheme pages
+* Government notifications
+* Scheme guidelines
+* Official government PDF documents
+
+Every important scheme record should retain source metadata where available:
+
+* Source URL
+* Document name
+* Relevant page or section
+* Verification date
+* Last checked date
+
+---
+
+# Eligibility Policy
 
 Eligibility checking is separate from normal language generation whenever possible.
 
@@ -204,43 +461,80 @@ The LLM may help understand user input and explain results, but scheme eligibili
 
 Possible results:
 
-- Potentially eligible
-- Not eligible based on available criteria
-- More information needed
-- Unable to verify
+* Potentially eligible
+* Not eligible based on available criteria
+* More information needed
+* Unable to verify
 
 Final eligibility decisions remain with the competent government authority.
 
 ---
 
-## Current Status
+# Environment Variables
 
-**Current stage:** Project foundation
+Sensitive configuration should not be stored directly in the source code.
 
-The repository structure and documentation are being prepared first.
+Create a `.env` file inside the `backend` directory when required.
 
-The next implementation task is to initialize the backend and frontend and define the official scheme data model before collecting schemes.
+Example:
+
+```text
+DATABASE_URL=
+LLM_API_KEY=
+LLM_MODEL=
+CHROMA_DB_PATH=
+```
+
+The `.env` file should not be committed to GitHub.
 
 ---
 
-## Academic Project
+# Current Status
+
+**Current Stage:** Project Foundation
+
+The repository structure and documentation are being prepared first.
+
+The next implementation tasks are:
+
+1. Initialize the FastAPI backend.
+2. Initialize the React frontend.
+3. Define the official scheme data model.
+4. Create the initial project API structure.
+5. Begin collecting verified official scheme information.
+
+---
+
+# Academic Project
 
 **Project:** NeetiNex — An AI-Powered Government Scheme Assistance Platform
 
 Initial scope:
 
-- Central Government schemes
-- Rajasthan Government schemes
-- Approximately 50–100 verified schemes
-- Source-grounded RAG
-- Eligibility checking
-- Web dashboard
-- Voice interaction
-- Temporary document RAG
-- Telephone interface if feasible
+* Central Government schemes
+* Rajasthan Government schemes
+* Approximately 50–100 verified schemes
+* Source-grounded RAG
+* Eligibility checking
+* Web dashboard
+* Voice interaction
+* Temporary document RAG
+* Telephone interface if feasible
 
 ---
 
-## License
+# Important Disclaimer
+
+NeetiNex is an academic assistance platform.
+
+The system provides information based on retrieved and verified sources available in its knowledge base. It does not make official government decisions.
+
+Eligibility results are preliminary and based on available criteria.
+
+Final eligibility and approval decisions remain with the relevant government authority.
+
+---
+
+# License
 
 This project is currently developed as an academic major project.
