@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.env
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data / storage
+storage/vector_db/*
+!storage/vector_db/.gitkeep
+storage/bm25_index/*
+!storage/bm25_index/.gitkeep
+storage/uploads/*
+!storage/uploads/.gitkeep
+
+# Raw private/large data
+data/raw/*
+!data/raw/.gitkeep
+
+# Logs
+*.log
