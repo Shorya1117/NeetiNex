@@ -109,7 +109,9 @@ The exact database and deployment choices may be finalized after the MVP data pi
 ```text
 NeetiNex/
 
-├── frontend/                   # React web dashboard
+NeetiNex/
+│
+├── frontend/
 │   ├── public/
 │   └── src/
 │       ├── components/
@@ -122,7 +124,7 @@ NeetiNex/
 │       ├── services/
 │       └── types/
 │
-├── backend/                    # FastAPI backend
+├── backend/
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── routes/
@@ -145,25 +147,25 @@ NeetiNex/
 │   └── tests/
 │
 ├── data/
-│   ├── raw/                    # Collected source data
-│   ├── verified/               # Verified source information
-│   ├── processed/              # Cleaned/chunked data
-│   ├── schemes/                # Structured scheme records
-│   └── eligibility_rules/      # Rule definitions
+│   ├── raw/
+│   ├── verified/
+│   ├── processed/
+│   ├── schemes/
+│   └── eligibility_rules/
 │
 ├── storage/
 │   ├── vector_db/
 │   ├── bm25_index/
 │   └── uploads/
 │
-├── scripts/                    # Data processing and utility scripts
-├── notebooks/                  # Experiments and analysis
-│
 ├── docs/
 │   ├── architecture/
 │   ├── data/
 │   ├── api/
 │   └── evaluation/
+│
+├── scripts/
+├── notebooks/
 │
 ├── .github/
 │   └── workflows/
