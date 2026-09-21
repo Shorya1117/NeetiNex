@@ -1,3 +1,5 @@
 requests
 selenium 
 beautifulsoup4
+langchain 
+langchain-text-splitters
