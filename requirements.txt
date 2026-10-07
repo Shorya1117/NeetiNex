@@ -3,3 +3,16 @@ selenium
 beautifulsoup4
 langchain 
 langchain-text-splitters
+fastapi
+uvicorn
+pydantic
+langchain 
+langchain-community 
+langchain-huggingface 
+chromadb 
+sentence-transformers
+react-markdown 
+remark-gfm
+streamlit 
+streamlit-mic-recorder
+requests
