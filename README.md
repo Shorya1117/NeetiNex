@@ -4,29 +4,137 @@
 
 NeetiNex is a major project focused on helping citizens discover and understand Central Government and Rajasthan Government schemes through natural-language interaction.
 
-The current development work focuses on collecting Government scheme data and preparing it for the next stages of the project.
+The platform is designed around two primary capabilities:
+
+1. **Scheme Discovery** — helping users find schemes based on their personal requirements and eligibility conditions.
+2. **Scheme Q&A** — allowing users to ask natural-language questions about government schemes and receive answers grounded in verified government information.
+
+The project also includes planned capabilities for document/PDF understanding, temporary document RAG, and voice interaction.
 
 ---
 
-## Project Overview
+# Project Overview
 
-The current data-processing pipeline of NeetiNex consists of the following stages:
+NeetiNex follows an accuracy-first architecture. Official Government websites, department portals, notifications, guidelines, and government documents are treated as the primary sources of scheme information.
+
+The current development pipeline is:
 
 ```text
-Government Website
-       ↓
-    Crawling
-       ↓
-   Extraction
-       ↓
-    Cleaning
-       ↓
- Deduplication
-       ↓
-    Chunking
+Official Government Sources
+          ↓
+       Crawling
+          ↓
+      Extraction
+          ↓
+      Validation
+          ↓
+       Cleaning
+          ↓
+    Deduplication
+          ↓
+ Section-Aware Chunking
+          ↓
+      Embeddings
+          ↓
+     Vector Store
+          ↓
+     RAG Retrieval
+          ↓
+    LLM Response
+          ↓
+ Official Source Reference
 ```
 
-All stages from **crawling to chunking have been completed**.
+Alongside the RAG pipeline, Scheme Discovery is planned as a separate eligibility path:
+
+```text
+User Information
+      ↓
+Structured User Profile
+      ↓
+Rule-Based Eligibility Engine
+      ↓
+Verified Eligibility Rules
+      ↓
+Matching Schemes
+      ↓
+RAG / Official Source
+      ↓
+Explanation
+```
+
+> **Important:** Vector similarity or an LLM should not be treated as proof of eligibility. Eligibility decisions are intended to use verified structured rules wherever possible.
+
+---
+
+# Current Development Status
+
+```text
+Government Data Crawling       ✓ Completed
+HTML Extraction                ✓ Completed
+Data Validation                ✓ Completed
+Text Cleaning                  ✓ Completed
+Exact Deduplication            ✓ Completed
+Section-Aware Chunking         ✓ Completed
+Embedding Generation           ✓ Completed
+Vector Store Integration       ✓ Completed
+RAG Pipeline                   ✓ Completed
+Frontend Integration           ✓ Completed
+Scheme Q&A                     ✓ Working / Implemented
+
+Scheme Discovery               → Under Development
+Rule-Based Eligibility Engine  → Planned / Under Development
+PDF Upload                     → Planned
+Temporary Document RAG          → Planned
+Hybrid Retrieval               → Future Enhancement
+Reranking                      → Future Enhancement
+Voice Interaction              → Future Phase
+```
+
+---
+
+# Technology Stack
+
+## Backend
+
+| Technology | Purpose |
+|---|---|
+| Python 3.13.14 | Backend, data processing and AI development |
+| FastAPI | Backend REST API |
+| Uvicorn | Development ASGI server |
+| Pydantic | API request/response validation |
+| LangChain | Document processing and RAG pipeline |
+| LangChain Text Splitters | Section-aware text chunking |
+| BeautifulSoup / HTML processing | Government HTML extraction |
+| JSON | Structured scheme data storage |
+
+## AI / RAG
+
+| Technology / Component | Purpose |
+|---|---|
+| Embedding Model | Converts scheme text into vector representations |
+| Vector Store | Stores and retrieves embedded scheme chunks |
+| LangChain | RAG orchestration and document handling |
+| LLM | Generates grounded natural-language responses |
+| Metadata | Supports scheme, department, section and source filtering |
+| Source URLs | Supports official source references |
+
+## Frontend
+
+| Technology | Purpose |
+|---|---|
+| Node.js 20.20.0 | Frontend development environment |
+| npm | Frontend package management |
+| Frontend application | User interface for Scheme Q&A and future features |
+
+## Development Tools
+
+| Tool | Purpose |
+|---|---|
+| Git | Version control |
+| GitHub | Remote repository and source-code management |
+| Visual Studio Code | Development environment |
+| Python Virtual Environment | Isolated Python dependencies |
 
 ---
 
@@ -37,53 +145,95 @@ NeetiNex/
 │
 ├── backend/
 │   │
+│   ├── api/
+│   │   └── main.py                  # FastAPI application
+│   │
+│   ├── rag/
+│   │   └── rag_chain.py             # RAG pipeline / response generation
+│   │
 │   ├── app/
-│   │   ├── api/                    # API endpoints for the application
-│   │   ├── core/                   # Core application configuration and utilities
-│   │   ├── db/                     # Database configuration and database-related code
-│   │   ├── eligibility/            # Scheme eligibility checking logic
-│   │   ├── models/                 # Application and database models
-│   │   ├── rag/                    # Retrieval-Augmented Generation components
-│   │   ├── schemas/                # Request and response schemas
-│   │   └── services/               # Application business logic and services
+│   │   ├── api/                     # Application API components
+│   │   ├── core/                    # Configuration and utilities
+│   │   ├── db/                      # Database-related components
+│   │   ├── eligibility/             # Eligibility-related logic
+│   │   ├── models/                  # Data/application models
+│   │   ├── rag/                     # RAG-related application components
+│   │   ├── schemas/                 # Request/response schemas
+│   │   └── services/                # Application services
 │   │
 │   ├── data/
 │   │   ├── raw/
-│   │   │   └── jansoochna/          # Raw data collected from Jan Soochna
-│   │   │
-│   │   ├── processed/
 │   │   │   └── jansoochna/
-│   │   │       ├── eligibility/     # Processed eligibility-related scheme data
-│   │   │       ├── extracted/       # Text/data extracted from collected documents
-│   │   │       ├── cleaned/         # Cleaned and normalized extracted data
-│   │   │       ├── deduplicated/    # Duplicate-free processed data
-│   │   │       ├── chunks/          # Final text chunks generated from documents
-│   │   │       └── quality_reports/ # Data-quality and processing reports
+│   │   │       └── eligibility/
+│   │   │           └── html/        # Raw Jan Soochna HTML
 │   │   │
-│   │   └── verified/                # Verified Government scheme data
+│   │   └── processed/
+│   │       └── jansoochna/
+│   │           └── eligibility/
+│   │               ├── extracted/   # Extracted JSON
+│   │               ├── cleaned/     # Cleaned JSON
+│   │               ├── deduplicated/# Duplicate-free JSON
+│   │               ├── chunks/      # LangChain-generated chunks
+│   │               └── quality_reports/
 │   │
 │   ├── ingestion/
-│   │   ├── chunking/                # Text chunking logic
-│   │   ├── cleaning/                # Text cleaning and normalization
-│   │   ├── deduplication/           # Duplicate document/content handling
-│   │   ├── extraction/              # Document and text extraction
-│   │   ├── jansoochna/              # Jan Soochna-specific ingestion components
-│   │   ├── pipeline/                # Data-processing pipeline orchestration
-│   │   └── validation/              # Data validation and quality checks
+│   │   ├── extraction/
+│   │   │   └── extract_html.py
+│   │   ├── validation/
+│   │   │   └── validate_eligibility.py
+│   │   ├── cleaning/
+│   │   │   └── clean_text.py
+│   │   ├── deduplication/
+│   │   │   └── deduplicate.py
+│   │   └── chunking/
+│   │       └── chunk_eligibility.py
 │   │
 │   └── tests/                       # Backend and pipeline tests
 │
 ├── frontend/
-│   ├── public/                      # Public frontend assets
+│   ├── public/
 │   └── src/
-│       ├── components/              # Reusable UI components
-│       ├── features/                # Feature-specific frontend modules
-│       ├── services/                # Frontend API and service integrations
-│       └── types/                   # Frontend type definitions
+│       ├── components/
+│       ├── features/
+│       ├── services/
+│       └── types/
 │
 ├── docs/                            # Project documentation
 │
+├── requirements.txt                 # Python dependencies
+├── README.md
 └── venv/                            # Python virtual environment
+```
+
+> Directory contents may expand as the project develops. The structure above represents the current major modules and the data-processing pipeline.
+
+---
+
+# Government Scheme Knowledge Base
+
+The current knowledge base is being prepared primarily from the **Rajasthan Jan Soochna Portal** and related official government sources.
+
+The current dataset contains:
+
+```text
+Processed scheme records : 192
+Exact duplicates         : 0
+Generated chunks         : 721
+```
+
+The current scheme record structure contains information such as:
+
+```text
+scheme_name
+scheme_id
+department
+source_type
+source_file
+source_path
+source_url
+eligibility_rules
+documents_required
+application_process
 ```
 
 ---
@@ -92,326 +242,771 @@ NeetiNex/
 
 ## 1. Crawling
 
-The crawling stage collects Government scheme-related information from the official Rajasthan Jan Soochna portal.
-
-The crawler collects the required pages and documents and stores the raw data for further processing.
+The crawling stage collects Government scheme-related information from official sources.
 
 ### Main tasks
 
-* Crawl the official source
-* Discover relevant scheme information
-* Collect document/page URLs
-* Download available documents
-* Store the collected raw data
-* Maintain source information
+- Crawl official government sources
+- Discover relevant scheme pages
+- Collect document/page URLs
+- Download available content
+- Store raw data
+- Preserve source information
 
-### Command
+### Example command
 
 ```powershell
-cd backend\ingestion\jansoochna\crawler
-python crawler.py
+cd D:\Sem7\Major\NeetiNex
 ```
+
+The exact crawler command depends on the current crawler implementation.
 
 ---
 
 ## 2. Extraction
 
-After crawling, the collected documents are processed to extract usable text.
-
-The extraction stage converts the collected document content into text that can be processed further.
+The extraction stage converts the raw Jan Soochna HTML into structured JSON scheme records.
 
 ### Main tasks
 
-* Read collected documents
-* Extract textual content
-* Process document content
-* Save extracted text
+- Read raw HTML
+- Identify the relevant eligibility section
+- Extract department
+- Identify scheme name and scheme ID
+- Extract eligibility rules
+- Extract required documents
+- Extract application process
+- Extract official scheme URL
+- Store source metadata
 
-### Command
+### Current command
+
+From the project root:
 
 ```powershell
-cd backend\ingestion\jansoochna\extraction
-python extraction.py
+cd D:\Sem7\Major\NeetiNex\backend
+python ingestion\extraction\extract_html.py
 ```
 
 ---
 
-## 3. Cleaning
+## 3. Validation
 
-The extracted text may contain unnecessary spaces, line breaks, formatting artifacts, and other unwanted content.
+Validation checks whether extracted records contain the required information before further processing.
 
-The cleaning stage prepares the extracted text into a cleaner and more consistent form.
+### Main checks
 
-### Main tasks
-
-* Remove unnecessary spaces
-* Normalize line breaks
-* Remove unwanted formatting
-* Clean extracted content
-* Prepare consistent text
-
-### Command
-
-```powershell
-cd backend\ingestion\jansoochna\cleaning
-python cleaning.py
-```
-
----
-
-## 4. Deduplication
-
-During crawling and processing, the same document or content can appear multiple times.
-
-The deduplication stage identifies duplicate data and keeps the required unique information.
-
-### Main tasks
-
-* Identify duplicate documents
-* Detect repeated content
-* Avoid unnecessary repeated processing
-* Preserve unique documents
-* Reduce duplicate data
+- Scheme name
+- Scheme ID
+- Department
+- Source file
+- Source URL
+- Eligibility rules
+- Required documents
+- Application process
+- Scheme matching information
 
 ### Command
 
 ```powershell
-cd backend\ingestion\jansoochna\deduplication
-python deduplication.py
+cd D:\Sem7\Major\NeetiNex\backend
+python ingestion\validation\validate_eligibility.py
+```
+
+### Current validation result
+
+```text
+Total files : 192
+Valid       : 192
+Warnings    : 0
+Errors      : 0
+```
+
+The validation report is stored under:
+
+```text
+backend\data\processed\jansoochna\eligibility\quality_reports\
 ```
 
 ---
 
-## 5. Chunking
+# 4. Cleaning
 
-Chunking is the final completed stage of the current data-preprocessing pipeline.
+The cleaning stage removes formatting noise while preserving government-source wording.
 
-The cleaned and deduplicated documents are divided into smaller text sections called chunks.
+### Cleaning includes
 
-These chunks provide a structured form of the processed Government scheme information for the next stage of the project.
+- Whitespace normalization
+- Removal of unnecessary numbering
+- Removal of leading Roman numeral markers
+- List-item cleanup
+- Formatting normalization
 
-### Main tasks
+### Important principle
 
-* Process cleaned documents
-* Split documents into smaller sections
-* Maintain useful document context
-* Preserve source information
-* Store the generated chunks
+The cleaning process does **not** automatically correct government-source spelling, grammar, or facts.
+
+This prevents preprocessing from silently changing official information.
 
 ### Command
 
 ```powershell
-cd backend\ingestion\jansoochna\chunking
-python chunking.py
+cd D:\Sem7\Major\NeetiNex\backend
+python ingestion\cleaning\clean_text.py
 ```
 
 ---
 
-# Complete Execution Order
+# 5. Exact Deduplication
 
-The complete pipeline should be executed in the following order:
+The deduplication stage identifies exact duplicate scheme records.
 
-### Step 1 — Crawling
+The comparison uses:
 
-```powershell
-cd backend\ingestion\jansoochna\crawler
-python crawler.py
+```text
+scheme_name
+scheme_id
+department
+eligibility_rules
+documents_required
+application_process
+source_url
 ```
 
-↓
+File names and file paths are not used as the main content identity.
 
-### Step 2 — Extraction
+### Command
 
 ```powershell
-cd ..\extraction
-python extraction.py
+cd D:\Sem7\Major\NeetiNex\backend
+python ingestion\deduplication\deduplicate.py
 ```
 
-↓
+### Current result
+
+```text
+Input files     : 192
+Unique files    : 192
+Duplicate files : 0
+Failed files    : 0
+```
+
+The duplicate report is stored under:
+
+```text
+backend\data\processed\jansoochna\eligibility\quality_reports\
+```
+
+---
+
+# 6. Section-Aware Chunking
+
+After cleaning and deduplication, the scheme records are converted into LangChain Documents.
+
+The current sections are:
+
+```text
+Government Scheme
+     │
+     ├── Eligibility
+     ├── Documents Required
+     └── Application Process
+```
+
+Each section is processed separately so that unrelated information is not unnecessarily mixed.
+
+### Chunking configuration
+
+```text
+Chunk Size   = 700 characters
+Overlap      = 100 characters
+```
+
+These values are initial parameters and can be tuned later through retrieval evaluation.
+
+### Command
+
+Install the required packages:
+
+```powershell
+cd D:\Sem7\Major\NeetiNex\backend
+pip install langchain langchain-text-splitters
+```
+
+Run chunking:
+
+```powershell
+python ingestion\chunking\chunk_eligibility.py
+```
+
+### Current result
+
+```text
+Input files     : 192
+Processed files : 192
+Failed files    : 0
+Total chunks    : 721
+```
+
+Generated chunks are stored in:
+
+```text
+backend\data\processed\jansoochna\eligibility\chunks\
+```
+
+---
+
+# Complete Data Processing Execution Order
+
+From the project root:
+
+```powershell
+cd D:\Sem7\Major\NeetiNex\backend
+```
+
+### Step 1 — Extraction
+
+```powershell
+python ingestion\extraction\extract_html.py
+```
+
+### Step 2 — Validation
+
+```powershell
+python ingestion\validation\validate_eligibility.py
+```
 
 ### Step 3 — Cleaning
 
 ```powershell
-cd ..\cleaning
-python cleaning.py
+python ingestion\cleaning\clean_text.py
 ```
-
-↓
 
 ### Step 4 — Deduplication
 
 ```powershell
-cd ..\deduplication
-python deduplication.py
+python ingestion\deduplication\deduplicate.py
 ```
-
-↓
 
 ### Step 5 — Chunking
 
 ```powershell
-cd ..\chunking
-python chunking.py
+python ingestion\chunking\chunk_eligibility.py
 ```
 
 ---
 
-# Current Data Flow
+# RAG Architecture
+
+The current Scheme Q&A architecture is:
 
 ```text
-                    Official Government Source
-                              │
-                              ▼
-                       ┌─────────────┐
-                       │   Crawler   │
-                       └──────┬──────┘
-                              │
-                              ▼
-                         Raw Data
-                              │
-                              ▼
-                       ┌─────────────┐
-                       │ Extraction  │
-                       └──────┬──────┘
-                              │
-                              ▼
-                       Extracted Text
-                              │
-                              ▼
-                       ┌─────────────┐
-                       │   Cleaning  │
-                       └──────┬──────┘
-                              │
-                              ▼
-                         Clean Text
-                              │
-                              ▼
-                     ┌─────────────────┐
-                     │  Deduplication  │
-                     └────────┬────────┘
-                              │
-                              ▼
-                        Unique Data
-                              │
-                              ▼
-                       ┌─────────────┐
-                       │   Chunking  │
-                       └──────┬──────┘
-                              │
-                              ▼
-                         Text Chunks
+                    User
+                     │
+                     ▼
+              Frontend Question
+                     │
+                     ▼
+                FastAPI API
+                     │
+                     ▼
+              Query Processing
+                     │
+                     ▼
+              Query Embedding
+                     │
+                     ▼
+                Vector Store
+                     │
+                     ▼
+            Relevant Scheme Chunks
+                     │
+                     ▼
+                RAG Context
+                     │
+                     ▼
+                    LLM
+                     │
+                     ▼
+             Grounded Response
+                     │
+                     ▼
+             Official Source
 ```
 
----
+The key principle is:
 
-# Issues Handled During Data Collection
-
-During the crawling stage, duplicate documents and repeated resources were encountered.
-
-Some documents could appear through different URLs or could be encountered multiple times during crawling.
-
-These issues were handled as part of the preprocessing pipeline so that duplicate information does not unnecessarily continue into the later stages.
-
-Another important concern was avoiding the accidental skipping of valid documents during the crawling and processing process.
-
-The pipeline therefore focuses on:
-
-* Detecting duplicate documents
-* Preserving valid documents
-* Avoiding unnecessary repeated processing
-* Maintaining source information
-* Preparing reliable processed data
+> The LLM should generate the explanation using retrieved government information rather than relying only on its internal knowledge.
 
 ---
 
-# Data Processing Output
+# Scheme Discovery Architecture
 
-After completing the current pipeline, the data passes through the following stages:
+Scheme Discovery is separate from normal question answering.
+
+The intended flow is:
 
 ```text
-Raw Data
-   ↓
-Extracted Data
-   ↓
-Cleaned Data
-   ↓
-Deduplicated Data
-   ↓
-Chunked Data
+User
+ │
+ ▼
+Personal Information
+ │
+ ├── Age
+ ├── State / Residence
+ ├── Income
+ ├── Student Status
+ ├── Occupation
+ └── Other Criteria
+ │
+ ▼
+Structured User Profile
+ │
+ ▼
+Rule-Based Eligibility Engine
+ │
+ ▼
+Verified Eligibility Rules
+ │
+ ▼
+Matching Schemes
+ │
+ ▼
+RAG / Official Information
+ │
+ ▼
+Explanation + Source
 ```
 
-The final output of the current completed work is the **chunked Government scheme dataset**.
+The current project does **not** treat vector similarity as a final eligibility decision.
+
+An earlier attempt was made to automatically extract eligibility conditions from natural-language scheme text. It was not reliable enough to be treated as the final eligibility-rule generation method.
+
+Therefore, structured eligibility rules require additional verification and careful design.
 
 ---
 
-# Current Project Status
+# Frontend and Backend
+
+The current application architecture connects the frontend to the FastAPI backend.
 
 ```text
-Crawling          ✓ Completed
-Extraction        ✓ Completed
-Cleaning          ✓ Completed
-Deduplication     ✓ Completed
-Chunking          ✓ Completed
+Frontend
+   │
+   ▼
+FastAPI Backend
+   │
+   ▼
+RAG Pipeline
+   │
+   ├── Query Processing
+   ├── Embedding
+   ├── Vector Store
+   ├── Retrieval
+   └── LLM
+   │
+   ▼
+Response
+   │
+   ▼
+Frontend
 ```
-
-### Current Milestone
-
-**Government Scheme Data Collection and Preprocessing — Completed up to Chunking**
-
-The data has successfully gone through the current preprocessing pipeline from crawling to chunk generation.
 
 ---
 
-# Development Sequence
+# Running the Backend
 
-The project development is being carried out step-by-step.
+Activate the virtual environment first.
 
-The currently completed sequence is:
+### Windows PowerShell
 
-```text
-1. Crawling
-       ↓
-2. Extraction
-       ↓
-3. Cleaning
-       ↓
-4. Deduplication
-       ↓
-5. Chunking
+From the project root:
+
+```powershell
+cd D:\Sem7\Major\NeetiNex
+.\venv\Scripts\Activate.ps1
 ```
 
-The project will continue from the processed chunked data in the next development stage.
+Then move to the backend:
+
+```powershell
+cd backend
+```
+
+Start FastAPI:
+
+```powershell
+uvicorn backend.api.main:app --reload
+```
+
+If the project is executed from a directory where the package path is different, use the import path corresponding to the current project structure.
+
+The development server is expected to run at:
+
+```text
+http://127.0.0.1:8000
+```
+
+FastAPI API documentation is available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+# Running the Frontend
+
+The frontend uses the Node.js/npm environment.
+
+From the project root:
+
+```powershell
+cd frontend
+```
+
+Install dependencies if required:
+
+```powershell
+npm install
+```
+
+Start the development server:
+
+```powershell
+npm run dev
+```
+
+Use the URL shown by the frontend development server in the terminal.
+
+> The exact frontend command can depend on the frontend package configuration.
+
+---
+
+# Python Environment Setup
+
+If the project environment needs to be recreated:
+
+```powershell
+cd D:\Sem7\Major\NeetiNex
+python -m venv venv
+```
+
+Activate:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+Install project dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+For the current LangChain chunking stage:
+
+```powershell
+pip install langchain langchain-text-splitters
+```
+
+---
+
+# Git Commands
+
+Check project status:
+
+```powershell
+git status
+```
+
+Add changes:
+
+```powershell
+git add .
+```
+
+Commit:
+
+```powershell
+git commit -m "update NeetiNex pipeline"
+```
+
+Push:
+
+```powershell
+git push
+```
+
+Pull latest changes:
+
+```powershell
+git pull
+```
+
+---
+
+# Important Data Directories
+
+## Raw Data
+
+```text
+backend\data\raw\jansoochna\eligibility\html\
+```
+
+Contains the original crawled HTML files.
+
+**Do not modify raw source files unnecessarily.**
+
+---
+
+## Extracted Data
+
+```text
+backend\data\processed\jansoochna\eligibility\extracted\
+```
+
+Contains structured JSON generated from raw HTML.
+
+---
+
+## Cleaned Data
+
+```text
+backend\data\processed\jansoochna\eligibility\cleaned\
+```
+
+Contains normalized JSON after formatting cleanup.
+
+---
+
+## Deduplicated Data
+
+```text
+backend\data\processed\jansoochna\eligibility\deduplicated\
+```
+
+Contains the unique processed scheme records used for downstream processing.
+
+---
+
+## Chunks
+
+```text
+backend\data\processed\jansoochna\eligibility\chunks\
+```
+
+Contains the final section-aware chunks used as input to the embedding/retrieval stage.
+
+---
+
+## Quality Reports
+
+```text
+backend\data\processed\jansoochna\eligibility\quality_reports\
+```
+
+Contains validation and deduplication reports.
 
 ---
 
 # Data Quality Principles
 
-The following principles are followed during the data-processing pipeline:
+NeetiNex follows these principles throughout the knowledge pipeline:
 
-* Use Government sources as the primary source of information.
-* Preserve source information wherever possible.
-* Avoid unnecessary duplicate data.
-* Do not lose valid documents during processing.
-* Keep raw and processed data separate.
-* Maintain a clear processing sequence.
-* Keep each processing stage modular.
-* Verify processed data before using it in subsequent stages.
+- Use official Government sources as the primary information source.
+- Preserve source information.
+- Keep raw and processed data separate.
+- Avoid unnecessary duplicate data.
+- Do not silently modify official facts.
+- Validate data before downstream processing.
+- Keep ingestion stages modular.
+- Preserve metadata required for source citation.
+- Do not treat LLM-generated guesses as official information.
+- Keep eligibility decision-making separate from normal LLM response generation where possible.
+
+---
+
+# Current Architecture Summary
+
+```text
+                         NeetiNex
+                            │
+             ┌──────────────┴──────────────┐
+             │                             │
+       Scheme Discovery                Scheme Q&A
+             │                             │
+     Eligibility Engine                   RAG
+             │                             │
+    Structured Rules                Vector Retrieval
+             │                             │
+             │                         LLM Response
+             │                             │
+             └──────────────┬──────────────┘
+                            │
+                 Government Knowledge Base
+                            │
+       ┌────────────────────┴────────────────────┐
+       │                                         │
+    Raw Sources                            Processed Data
+       │                                         │
+    Crawling → Extraction → Validation → Cleaning
+                            ↓
+                     Deduplication
+                            ↓
+                  Section-Aware Chunking
+                            ↓
+                       Embeddings
+                            ↓
+                      Vector Store
+```
+
+---
+
+# Future Document / PDF RAG
+
+PDF/document upload is planned as a separate temporary retrieval workflow.
+
+The intended architecture is:
+
+```text
+User Uploads PDF
+       ↓
+Document Processing
+       ↓
+Temporary Chunks
+       ↓
+Temporary Vector Store
+       ↓
+User Question
+       ↓
+Retrieval
+       ↓
+Document Context
+       ↓
+LLM
+       ↓
+Answer
+```
+
+Uploaded documents should remain separate from the permanent Government Scheme Knowledge Base.
+
+This prevents user-provided documents from contaminating the verified government scheme dataset.
+
+---
+
+# Future Development
+
+The upcoming development stages include:
+
+1. Improve and test Scheme Q&A retrieval.
+2. Implement and evaluate the Rule-Based Eligibility Engine.
+3. Develop Scheme Discovery user flow.
+4. Implement PDF upload.
+5. Implement temporary PDF/document RAG.
+6. Improve retrieval using BM25 and hybrid retrieval.
+7. Add reranking.
+8. Improve source citation and answer grounding.
+9. Add conversational user profile support.
+10. Add voice interaction.
+11. Perform systematic testing and evaluation.
+12. Prepare final project documentation and demonstration.
+
+---
+
+# Current Milestone
+
+```text
+Government Scheme Knowledge Base
+              ↓
+Crawling                 ✓
+Extraction               ✓
+Validation               ✓
+Cleaning                 ✓
+Deduplication            ✓
+Chunking                 ✓
+Embeddings               ✓
+Vector Store             ✓
+RAG Pipeline             ✓
+Frontend                 ✓
+```
+
+### Current Major Milestone
+
+**Government scheme data has been processed from raw official HTML through extraction, validation, cleaning, deduplication and section-aware chunking, and the resulting knowledge has been connected to embeddings, vector retrieval, RAG and the initial frontend workflow.**
 
 ---
 
 # Project Status Summary
 
 **Project:** NeetiNex
+
 **Title:** An AI-Powered Government Scheme Assistance Platform
 
-**Current completed milestone:**
+**Primary Features:**
 
-> Government scheme data has been crawled, extracted, cleaned, deduplicated, and chunked.
+- Scheme Discovery
+- Scheme Q&A
+- Official Source References
+- Rule-Based Eligibility Checking
+- RAG-based Government Scheme Question Answering
+- Temporary Document/PDF RAG
+- Future Voice Interaction
 
-**Current pipeline:**
+**Current Data Pipeline:**
 
 ```text
-Crawling → Extraction → Cleaning → Deduplication → Chunking
+Crawling
+   ↓
+Extraction
+   ↓
+Validation
+   ↓
+Cleaning
+   ↓
+Deduplication
+   ↓
+Section-Aware Chunking
+   ↓
+Embeddings
+   ↓
+Vector Store
+   ↓
+RAG
+   ↓
+Frontend
 ```
 
-**Status:** Completed up to Chunking
+**Current Dataset Result:**
+
+```text
+192 processed scheme records
+721 generated chunks
+0 exact duplicates
+0 validation errors
+```
+
+---
+
+# Notes for Contributors
+
+Before changing the pipeline:
+
+1. Keep the raw government data unchanged.
+2. Test changes on processed data first.
+3. Run validation after extraction changes.
+4. Run deduplication before chunking.
+5. Verify chunk quality before changing embedding/retrieval logic.
+6. Preserve scheme metadata and official source URLs.
+7. Do not automatically convert uncertain natural-language eligibility text into final eligibility rules.
+8. Keep temporary uploaded documents separate from the permanent government knowledge base.
+9. Commit changes regularly using Git.
+10. Prefer simple, modular and testable implementations.
+
+---
+
+# License / Academic Project
+
+NeetiNex is an academic major project developed for educational and research purposes.
+
+Government scheme information should be verified against the latest official Government source before being used for real-world decisions.

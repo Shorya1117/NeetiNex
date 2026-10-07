@@ -16,3 +16,5 @@ remark-gfm
 streamlit 
 streamlit-mic-recorder
 requests
+pypdf
+faiss-cpu
