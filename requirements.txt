@@ -18,3 +18,6 @@ streamlit-mic-recorder
 requests
 pypdf
 faiss-cpu
+pymupdf 
+pytesseract
+pillow

@@ -6,6 +6,8 @@ from backend.rag.rag_chain import NeetiNexRAG
 from backend.rag.pdf_rag import TemporaryPDFRAG
 
 import os
+import uuid
+from pathlib import Path
 
 
 # ======================================
