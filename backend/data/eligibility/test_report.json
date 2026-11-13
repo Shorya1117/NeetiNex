@@ -1,0 +1,22 @@
+{
+  "synthetic_engine_tests": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "false_eligible": 0,
+    "false_not_eligible": 0,
+    "unknown_status_wrong": 0,
+    "note": "Synthetic hand-written cases - proves engine logic only."
+  },
+  "real_dataset_timing": {
+    "schemes_evaluated": 192,
+    "check_multiple_ms": 22.3,
+    "status_counts_for_sample_profile": {
+      "ELIGIBLE": 1,
+      "UNVERIFIED": 91,
+      "NEED_MORE_INFORMATION": 94,
+      "NOT_ELIGIBLE": 6
+    }
+  },
+  "manually_verified_real_scheme_accuracy": "Not measured yet - needs reviewer-verified expected outcomes for real schemes."
+}

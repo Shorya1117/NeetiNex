@@ -6,6 +6,8 @@ import base64
 import os
 import hashlib
 
+from eligibility_table import render_eligibility_table
+
 
 # -----------------------------------------------------------------------------
 # PAGE CONFIGURATION
@@ -387,7 +389,10 @@ def query_scheme_backend(prompt: str):
     payload = {
         "query": prompt,
         "question": prompt,
-        "message": prompt
+        "message": prompt,
+        # details the user already told us earlier in this chat (session only)
+        "profile": st.session_state.get("user_profile") or None,
+        "topics": st.session_state.get("user_topics") or None
     }
 
     headers = {"Content-Type": "application/json"}
@@ -419,7 +424,12 @@ def query_scheme_backend(prompt: str):
             return {
                 "success": True,
                 "answer": answer,
-                "sources": sources
+                "sources": sources,
+                "table": data.get("table"),
+                "profile": data.get("profile"),
+                "topic_keywords": data.get("topic_keywords"),
+                "profile_summary": data.get("profile_summary"),
+                "assumptions": data.get("assumptions")
             }
 
         return {
@@ -630,6 +640,12 @@ welcome_logo_html = (
 )
 
 with tab_schemes:
+    if st.session_state.get("user_profile"):
+        if st.button("🔄 Reset my details", key="btn_reset_profile"):
+            st.session_state.user_profile = None
+            st.session_state.user_topics = None
+            st.rerun()
+
     scheme_chat_container = st.container()
 
     with scheme_chat_container:
@@ -657,7 +673,13 @@ with tab_schemes:
                 with st.chat_message(message["role"]):
                     st.write(message["content"])
 
-                    if (
+                    if message.get("table"):
+                        render_eligibility_table(
+                            message,
+                            key=str(id(message))
+                        )
+
+                    elif (
                         message["role"] == "assistant"
                         and message.get("sources")
                     ):
@@ -713,12 +735,26 @@ with tab_schemes:
 
                 if result["success"]:
                     st.write(result["answer"])
-                    display_sources(result["sources"])
+
+                    if result.get("profile"):
+                        st.session_state.user_profile = result["profile"]
+                        st.session_state.user_topics = result.get("topic_keywords")
+
+                    if result.get("table"):
+                        render_eligibility_table(
+                            result,
+                            key=f"new_{len(st.session_state.scheme_messages)}"
+                        )
+                    else:
+                        display_sources(result["sources"])
 
                     st.session_state.scheme_messages.append({
                         "role": "assistant",
                         "content": result["answer"],
-                        "sources": result["sources"]
+                        "sources": result["sources"],
+                        "table": result.get("table"),
+                        "profile_summary": result.get("profile_summary"),
+                        "assumptions": result.get("assumptions")
                     })
 
                 else:

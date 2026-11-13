@@ -1,0 +1,232 @@
+{
+  "generated_at": "2026-11-12T07:30:01.821912+00:00",
+  "schema_version": "1.0",
+  "data_source": "Chroma collection 'neetinex_schemes' (read-only)",
+  "total_schemes_processed": 192,
+  "schemes_with_eligibility_text": 192,
+  "structuring_status": {
+    "partially_structured": 144,
+    "unstructured": 42,
+    "fully_structured": 6
+  },
+  "schemes_requiring_manual_review": 186,
+  "schemes_with_verified_source": 0,
+  "schemes_with_conflicting_rules": 2,
+  "coverage_by_field": {
+    "age": 31,
+    "income_any": 66,
+    "gender": 8,
+    "state": 120,
+    "category": 14,
+    "disability": 20,
+    "bpl": 8,
+    "occupation": 4,
+    "marital_status": 1,
+    "education_class": 7,
+    "minority": 0
+  },
+  "income_type_breakdown": {
+    "annual_family_income": 33,
+    "annual_personal_income": 23,
+    "annual_parent_income": 8,
+    "annual_income": 2
+  },
+  "eligibility_lines": {
+    "auto_structured_rules": 307,
+    "manual_review_lines": 777,
+    "informational_lines": 21,
+    "manual_by_reason": {
+      "partial": 53,
+      "unparsed": 471,
+      "exclusion": 92,
+      "incomplete": 28,
+      "conditional": 41,
+      "too_long": 51,
+      "enumerated": 41
+    }
+  },
+  "unstructured_schemes": [
+    {
+      "scheme_id": "177",
+      "scheme_name": "Additional Financial Assistance for the children of persons engaged in the cleaning profession."
+    },
+    {
+      "scheme_id": "81",
+      "scheme_name": "Antheyesthi Anudan Yojana"
+    },
+    {
+      "scheme_id": "146",
+      "scheme_name": "Chief Minister Rajshree Yojana"
+    },
+    {
+      "scheme_id": "120",
+      "scheme_name": "Construction Worker Life and Future Safety Plan"
+    },
+    {
+      "scheme_id": "121",
+      "scheme_name": "Construction Workers Education and Skill Development Scheme"
+    },
+    {
+      "scheme_id": "122",
+      "scheme_name": "Construction workers Sulabh Aawas Yojana"
+    },
+    {
+      "scheme_id": "229",
+      "scheme_name": "Distance Education Scheme For Girls"
+    },
+    {
+      "scheme_id": "147",
+      "scheme_name": "Economic Assistance Award for Girls with Physical Disabilities (Deaf and Dumb)"
+    },
+    {
+      "scheme_id": "211",
+      "scheme_name": "Facilities for Gallantry Awardees"
+    },
+    {
+      "scheme_id": "209",
+      "scheme_name": "Financial Assistance Scheme for Journalists"
+    },
+    {
+      "scheme_id": "36",
+      "scheme_name": "Free Coaching for Gen-BPL"
+    },
+    {
+      "scheme_id": "34",
+      "scheme_name": "Free Coaching for OBC"
+    },
+    {
+      "scheme_id": "35",
+      "scheme_name": "Free Coaching for SBC"
+    },
+    {
+      "scheme_id": "32",
+      "scheme_name": "Free Coaching for SC"
+    },
+    {
+      "scheme_id": "33",
+      "scheme_name": "Free Coaching for ST"
+    },
+    {
+      "scheme_id": "202",
+      "scheme_name": "Free Travel Facility for Person Suffering from Various Diseases"
+    },
+    {
+      "scheme_id": "78",
+      "scheme_name": "Gadiya Luhar Maharana Pratap Makan Nirman Yojana"
+    },
+    {
+      "scheme_id": "77",
+      "scheme_name": "Gadiya Luhar Raw Material Yojana"
+    },
+    {
+      "scheme_id": "178",
+      "scheme_name": "Identity Card for De Notified ,Nomades and Semi Nomads Tribe"
+    },
+    {
+      "scheme_id": "144",
+      "scheme_name": "Indira Gandhi Maternity Nutrition Scheme"
+    },
+    {
+      "scheme_id": "85",
+      "scheme_name": "Mahila Swaysiddha Yojana"
+    },
+    {
+      "scheme_id": "57",
+      "scheme_name": "Mukhyamantree Ayushman Arogya Yojana"
+    },
+    {
+      "scheme_id": "226",
+      "scheme_name": "National Food Security Mission Beej Minikit"
+    },
+    {
+      "scheme_id": "79",
+      "scheme_name": "Navjeevan Yojana"
+    },
+    {
+      "scheme_id": "84",
+      "scheme_name": "Pannaadhayee Jeevan Amrit Yojana-Scholarship"
+    },
+    {
+      "scheme_id": "132",
+      "scheme_name": "PM Kisan SamamaanNidhi Yojana"
+    },
+    {
+      "scheme_id": "130",
+      "scheme_name": "Pradhan Mantri Jan Dhan Yojana"
+    },
+    {
+      "scheme_id": "145",
+      "scheme_name": "Pradhan Mantri Matru Vandana Yojana"
+    },
+    {
+      "scheme_id": "46",
+      "scheme_name": "Rajasthan Free Laptop Vitran Yojana 2020"
+    },
+    {
+      "scheme_id": "148",
+      "scheme_name": "Rajasthan Free Laptop Vitran Yojana 2020-Female"
+    },
+    {
+      "scheme_id": "222",
+      "scheme_name": "Reimbursement of Interest on Commercial Loan Scheme for Construction Workers"
+    },
+    {
+      "scheme_id": "188",
+      "scheme_name": "Saksham – Self-Employment Based Skill Education Campaign"
+    },
+    {
+      "scheme_id": "189",
+      "scheme_name": "Samarth - Self-Sufficiency Through Skills"
+    },
+    {
+      "scheme_id": "62",
+      "scheme_name": "Silicosis Policy - Assistance on death"
+    },
+    {
+      "scheme_id": "65",
+      "scheme_name": "Silicosis Policy - Funeral Assistance"
+    },
+    {
+      "scheme_id": "63",
+      "scheme_name": "Silicosis Policy - Pneumoconiosis Rehabilitation Pension"
+    },
+    {
+      "scheme_id": "64",
+      "scheme_name": "Silicosis Policy - Provision for sustenance of family"
+    },
+    {
+      "scheme_id": "61",
+      "scheme_name": "Silicosis Policy - Rehabilitation Assistance"
+    },
+    {
+      "scheme_id": "119",
+      "scheme_name": "Subh Shakti Yojana"
+    },
+    {
+      "scheme_id": "217",
+      "scheme_name": "Three Year Diploma Course in Handloom"
+    },
+    {
+      "scheme_id": "167",
+      "scheme_name": "Transgender Upliftment Fund Scheme"
+    },
+    {
+      "scheme_id": "117",
+      "scheme_name": "Videsh me Sanathak estr ki shiksha suvidha yojana"
+    }
+  ],
+  "validation_issues": {
+    "225": [
+      "225-R4: conflicting values for category IN",
+      "225-R5: conflicting values for category IN"
+    ],
+    "126": [
+      "126-R1: conflicting values for age BETWEEN",
+      "126-R3: conflicting values for age BETWEEN"
+    ]
+  },
+  "notes": [
+    "All schemes are 'extracted_unverified' unless listed in verified_overrides.json - extraction from a crawler is NOT official verification.",
+    "Missing/unparsed criteria are kept as manual rules; they are never treated as 'no restriction'."
+  ]
+}

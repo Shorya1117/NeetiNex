@@ -21,3 +21,7 @@ faiss-cpu
 pymupdf 
 pytesseract
 pillow
+python-dotenv
+langchain-groq
+pytest
+httpx

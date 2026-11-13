@@ -90,7 +90,11 @@ STRICT RULES:
    when you only received extracted text.
 10. Answer in the language used by the user.
 11. Keep answers clear and concise.
-12. If the context contradicts itself or contains suspicious
+12. Copy every number, percentage, year and amount EXACTLY as it appears in
+    the context; never "correct" or recompute it. If the user's question
+    contains a year/number that differs from the context, answer from the
+    context and mention the difference.
+13. If the context contradicts itself or contains suspicious
     OCR text, explain the uncertainty instead of guessing.
 
 Retrieved PDF context:
@@ -158,14 +162,13 @@ Retrieved PDF context:
                 output_type=Output.DICT
             )
 
-            # Pass 2: numeric-only English recognition.
+            # Pass 2: plain English recognition, used ONLY to repair digits.
+            # (hin+eng can drop digits such as the "1" in "1,20,000"; the old
+            # whitelist pass found no candidates at all.)
             numeric = pytesseract.image_to_data(
                 gray,
                 lang="eng",
-                config=(
-                    "--oem 1 --psm 11 "
-                    "-c tessedit_char_whitelist=0123456789.%/-:"
-                ),
+                config="--oem 1 --psm 6",
                 output_type=Output.DICT
             )
 
@@ -229,12 +232,15 @@ Retrieved PDF context:
                 })
 
             corrections = []
+            unclear = []
 
             for word in primary_words:
                 original = word["text"]
 
-                # Only correct tokens which already contain digits.
-                if not re.search(r"\d", original):
+                # Only repair tokens that contain digits, or are pure
+                # punctuation (a digit mis-read as a danda / bar).
+                has_digit = bool(re.search(r"\d", original))
+                if not has_digit and re.search(r"\w", original):
                     continue
 
                 matches = []
@@ -247,30 +253,46 @@ Retrieved PDF context:
                     continue
 
                 matches.sort(
-                    key=lambda pair: (
-                        pair[0],
-                        pair[1]["confidence"]
-                    ),
+                    key=lambda pair: (pair[0], pair[1]["confidence"]),
                     reverse=True
                 )
 
                 overlap, best = matches[0]
-                old_groups = re.findall(r"\d+", original)
-                new_groups = re.findall(r"\d+", best["text"])
+                old_digits = "".join(re.findall(r"\d", original))
+                new_digits = "".join(re.findall(r"\d", best["text"]))
 
-                # Avoid ambiguous one-to-many or many-to-one replacements.
-                if not old_groups or len(old_groups) != len(new_groups):
+                if old_digits == new_digits:
                     continue
 
-                updated = original
-                for old, new in zip(old_groups, new_groups):
-                    updated = re.sub(re.escape(old), new, updated, count=1)
+                # Hindi+English OCR often mis-reads Latin digits (drops "1",
+                # or reads "1" as "4": 2013 -> 2043, 12% -> 42%). The English
+                # model is far better at Latin digits, so when the two digit
+                # strings differ by at most 2 single-digit edits and the
+                # English reading is confident, take the English reading.
+                def edit_distance(x, y):
+                    prev = list(range(len(y) + 1))
+                    for i, cx in enumerate(x, 1):
+                        cur = [i]
+                        for j, cy in enumerate(y, 1):
+                            cur.append(min(prev[j] + 1, cur[j - 1] + 1,
+                                           prev[j - 1] + (cx != cy)))
+                        prev = cur
+                    return prev[-1]
 
-                if updated != original:
-                    word["text"] = updated
+                distance = edit_distance(old_digits, new_digits)
+                if (
+                    best["confidence"] >= 50
+                    and not re.search(r"[A-Za-z\u0900-\u097F]", best["text"])
+                    and len(new_digits) >= 1
+                    and distance <= 2
+                    and abs(len(new_digits) - len(old_digits)) <= 2
+                ):
+                    word["text"] = best["text"]
                     corrections.append(
-                        (original, updated, best["text"], round(overlap, 2))
+                        (original, best["text"], best["text"], round(overlap, 2))
                     )
+                else:
+                    unclear.append((original, best["text"]))
 
             # Rebuild text in Tesseract's original line and word order.
             lines = {}
@@ -800,6 +822,20 @@ Retrieved PDF context:
 
         if not isinstance(answer, str):
             answer = str(answer)
+
+        # Show only the pages the answer actually cites (the model is told to
+        # write "PDF page N"). If it cites none, keep every retrieved page.
+        cited = {
+            int(n)
+            for n in re.findall(
+                r"(?:PDF\s*)?(?:page|pages|पृष्ठ|पेज)\s*[:\-]?\s*(\d{1,4})",
+                answer,
+                flags=re.IGNORECASE
+            )
+        }
+        cited_sources = [s for s in sources if s["page"] in cited]
+        if cited_sources:
+            sources = sorted(cited_sources, key=lambda s: s["page"])
 
         return {
             "answer": answer,

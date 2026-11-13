@@ -1,12 +1,18 @@
+import re
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from backend.rag.rag_chain import NeetiNexRAG
 from backend.rag.pdf_rag import TemporaryPDFRAG
+from backend.api.routers.eligibility import router as eligibility_router
+from backend.services.eligibility.chat_eligibility_service import handle_eligibility_chat
+from backend.services.eligibility.rag_bridge import build_llm_fn, build_semantic_fn
 
+import logging
 import os
 import uuid
+from typing import List, Optional
 from pathlib import Path
 
 
@@ -35,11 +41,20 @@ app.add_middleware(
 
 
 # ======================================
+# Eligibility Engine (rule-based, separate from RAG)
+# ======================================
+
+app.include_router(eligibility_router)
+
+
+# ======================================
 # Request Models
 # ======================================
 
 class ChatRequest(BaseModel):
     message: str
+    profile: Optional[dict] = None   # details told earlier in this chat (session only)
+    topics: Optional[List[str]] = None   # topic of the earlier eligibility search
 
 
 class PDFQuestionRequest(BaseModel):
@@ -123,7 +138,34 @@ def chat(request: ChatRequest):
             "error": "Scheme RAG system is not initialized."
         }
 
+    if re.fullmatch(r"\s*(hi+|hello+|hey+|namaste|namaskar|hii+|good (morning|evening|afternoon)|नमस्ते)\W*",
+                    request.message, re.I):
+        return {
+            "success": True,
+            "answer": "Namaste! Main NeetiNex hu. Kisi Rajasthan scheme ke baare mein poochiye, "
+                      "ya apni details batayiye (jaise: class, income, category, kaam) aur main "
+                      "aapke liye eligible schemes ki table bana dunga.",
+            "sources": []
+        }
+
     try:
+
+        # "I am in class 8, income 1 lakh, which scholarships?" -> comparison
+        # table from the rule engine. Other questions continue to normal RAG.
+        try:
+            eligibility_response = handle_eligibility_chat(
+                request.message,
+                request.profile,
+                llm_fn=build_llm_fn(scheme_rag),
+                semantic_fn=build_semantic_fn(scheme_rag),
+                previous_topics=request.topics
+            )
+        except Exception:
+            logging.getLogger(__name__).exception("Eligibility chat failed")
+            eligibility_response = None
+
+        if eligibility_response:
+            return eligibility_response
 
         result = scheme_rag.ask(
             request.message
@@ -190,9 +232,11 @@ async def upload_pdf(
         exist_ok=True
     )
 
+    # basename + unique prefix: no path tricks, no clash between two uploads
+    safe_name = os.path.basename(file.filename.replace("\\", "/"))
     temp_path = os.path.join(
         temp_dir,
-        file.filename
+        f"{uuid.uuid4().hex[:8]}_{safe_name}"
     )
 
     try:
